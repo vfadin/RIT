@@ -10,9 +10,11 @@ class HomeRepo(
     private val dataSource: BinListRemoteDataSource,
 ) : IHomeRepo {
 
-    override suspend fun getNameInfo(name: String): RequestResult<CountryNameProbability> {
-        return when (val response = dataSource.getNationalizeInfoByName("https://api.nationalize.io/", name)) {
-            is RequestResult.Success -> RequestResult.Success(response.result.toCountryNameProbability())
+    override suspend fun getNameInfo(name: List<String>): RequestResult<List<CountryNameProbability>> {
+        return when (val response =
+            dataSource.getNationalizeInfoByName("https://api.nationalize.io/", name)) {
+            is RequestResult.Success ->
+                RequestResult.Success(response.result.map { it.toCountryNameProbability() })
             is RequestResult.Error -> RequestResult.Error(response.exception)
         }
     }

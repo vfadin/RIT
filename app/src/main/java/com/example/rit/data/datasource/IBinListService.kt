@@ -10,6 +10,6 @@ interface IBinListService {
     @GET
     suspend fun getNameInfo(
         @Url url: String,
-        @Query("name") name: String
-    ): ApiCountryNameProbability
+        @Query("name[]") name: List<String>
+    ): List<ApiCountryNameProbability>
 }

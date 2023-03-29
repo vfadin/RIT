@@ -6,9 +6,9 @@ import javax.inject.Singleton
 
 @Singleton
 class BinListRemoteDataSource @Inject constructor(
-    private val api: IBinListService
+    private val api: IBinListService,
 ) {
-    suspend fun getNationalizeInfoByName(url: String, name: String) = safeApiCall {
+    suspend fun getNationalizeInfoByName(url: String, name: List<String>) = safeApiCall {
         api.getNameInfo(url, name)
     }
 }

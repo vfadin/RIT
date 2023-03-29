@@ -8,6 +8,8 @@ import com.example.rit.domain.repo.IHomeRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,19 +17,14 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repo: IHomeRepo,
 ) : ViewModel() {
-    private val _nameCountryStateFlow = MutableStateFlow<CountryNameProbability?>(null)
+    private val _nameCountryStateFlow = MutableStateFlow<List<CountryNameProbability>?>(null)
     val nameCountryStateFlow = _nameCountryStateFlow.asStateFlow()
 
-    init {
-        getNameInCountryProbability("Michael")
-    }
-
-    fun getNameInCountryProbability(name: String) {
-        viewModelScope.launch {
-            when (val response = repo.getNameInfo(name)) {
-                is RequestResult.Success -> _nameCountryStateFlow.value = response.result
-                is RequestResult.Error -> {}
-            }
+    suspend fun getNameInCountryProbability(name: String) {
+        val slices = name.split(',')
+        when (val response = repo.getNameInfo(slices)) {
+            is RequestResult.Success -> _nameCountryStateFlow.emit(response.result)
+            is RequestResult.Error -> {}
         }
     }
 }
