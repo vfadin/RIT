@@ -10,5 +10,9 @@
         android:name="com.example.rit.ui.home.HomeFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_home"/>
+    <fragment
+        android:id="@+id/fullScreenImageFragment"
+        android:name="com.example.rit.ui.home.FullScreenImageFragment"
+        android:label="FullScreenImageFragment" />
 
 </navigation>

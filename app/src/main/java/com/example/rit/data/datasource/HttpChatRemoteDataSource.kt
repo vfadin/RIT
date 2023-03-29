@@ -11,4 +11,8 @@ class BinListRemoteDataSource @Inject constructor(
     suspend fun getNationalizeInfoByName(url: String, name: List<String>) = safeApiCall {
         api.getNameInfo(url, name)
     }
+
+    suspend fun getDogImage() = safeApiCall {
+        api.getImage()
+    }
 }

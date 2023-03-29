@@ -1,7 +1,7 @@
 package com.example.rit.domain.entity
 
-import com.example.rit.data.dto.ApiCountryItem
-import com.example.rit.data.dto.ApiCountryNameProbability
+import com.example.rit.data.dto.nationalize.ApiCountryItem
+import com.example.rit.data.dto.nationalize.ApiCountryNameProbability
 import java.util.*
 
 data class CountryNameProbability(

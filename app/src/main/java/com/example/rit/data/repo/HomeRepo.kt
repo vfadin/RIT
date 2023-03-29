@@ -18,4 +18,11 @@ class HomeRepo(
             is RequestResult.Error -> RequestResult.Error(response.exception)
         }
     }
+
+    override suspend fun getDogImage(): RequestResult<String> {
+        return when (val response = dataSource.getDogImage()) {
+            is RequestResult.Success -> RequestResult.Success(response.result.url ?: "")
+            is RequestResult.Error -> RequestResult.Error(response.exception)
+        }
+    }
 }

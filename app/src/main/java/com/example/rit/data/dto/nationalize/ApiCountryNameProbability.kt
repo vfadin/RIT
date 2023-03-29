@@ -1,4 +1,4 @@
-package com.example.rit.data.dto
+package com.example.rit.data.dto.nationalize
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
