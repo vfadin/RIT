@@ -8,6 +8,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.rit.R
 import com.example.rit.databinding.FragmentFullImageBinding
@@ -37,8 +38,13 @@ class FullScreenImageFragment : Fragment(R.layout.fragment_full_image) {
                 view.onApplyWindowInsets(windowInsets)
             }
         }
-        Glide.with(requireContext())
-            .load(arguments?.getString("url", ""))
-            .into(binding.image)
+        binding.image.let {
+            Glide.with(requireContext())
+                .load(arguments?.getString("url", ""))
+                .into(it)
+            it.setOnClickListener {
+                findNavController().navigateUp()
+            }
+        }
     }
 }
