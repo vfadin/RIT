@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.rit.R
@@ -32,7 +33,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun bindUi() {
-
+        with(binding) {
+            textField.apply {
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                setOnEditorActionListener { text, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        viewModel.getNameInCountryProbability(text.text.toString())
+                        return@setOnEditorActionListener true
+                    }
+                    false
+                }
+                isSingleLine = true
+            }
+        }
     }
 
     override fun onDestroyView() {

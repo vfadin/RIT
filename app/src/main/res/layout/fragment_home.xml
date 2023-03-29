@@ -9,16 +9,15 @@
         android:id="@+id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingVertical="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/text_field"
+            android:paddingVertical="8dp"
             tools:ignore="SpeakableTextPresentCheck"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"
             android:maxHeight="50dp"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent" />
