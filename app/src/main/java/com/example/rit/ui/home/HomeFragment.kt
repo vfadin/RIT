@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.rit.R
 import com.example.rit.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -34,6 +36,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun bindUi() {
         with(binding) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.nameCountryStateFlow.collect { nameProbability ->
+                    textViewRequestAnswer.text =
+                        buildString {
+                            append(getString(R.string.nationalize_answer_title))
+                            append(" ${nameProbability?.name} in:\n")
+                            append(nameProbability?.country?.joinToString(separator = "") {
+                                it.toString()
+                            })
+                        }
+                }
+            }
             textField.apply {
                 imeOptions = EditorInfo.IME_ACTION_DONE
                 setOnEditorActionListener { text, actionId, _ ->

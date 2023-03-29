@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             when (val response = repo.getNameInfo(name)) {
                 is RequestResult.Success -> _nameCountryStateFlow.value = response.result
-                is RequestResult.Error -> TODO()
+                is RequestResult.Error -> {}
             }
         }
     }

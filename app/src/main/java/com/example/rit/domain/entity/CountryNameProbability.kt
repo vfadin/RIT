@@ -2,6 +2,7 @@ package com.example.rit.domain.entity
 
 import com.example.rit.data.dto.ApiCountryItem
 import com.example.rit.data.dto.ApiCountryNameProbability
+import java.util.*
 
 data class CountryNameProbability(
     val country: List<CountryItem> = emptyList(),
@@ -10,12 +11,18 @@ data class CountryNameProbability(
 
 data class CountryItem(
     val probability: Double = .0,
-    val countryId: String = ""
-)
+    val countryId: String = "",
+    val name: String = "",
+) {
+    override fun toString(): String {
+        return "$name $countryId = $probability\n"
+    }
+}
 
 fun ApiCountryItem.toCountryItem() = CountryItem(
     probability = probability ?: .0,
-    countryId = countryId ?: ""
+    countryId = countryId ?: "",
+    name = countryId?.let { Locale("", it).displayCountry } ?: ""
 )
 
 fun ApiCountryNameProbability.toCountryNameProbability() = CountryNameProbability(
