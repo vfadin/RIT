@@ -13,6 +13,8 @@ import com.bumptech.glide.Glide
 import com.example.rit.R
 import com.example.rit.databinding.FragmentHomeBinding
 import com.example.rit.databinding.FragmentHomeDogBinding
+import com.example.rit.utils.Constants
+import com.example.rit.utils.restoreChosenApi
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -20,13 +22,14 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
-
     private var _binding: FragmentHomeBinding? = null
-    private var _binding_dog: FragmentHomeDogBinding? = null
-    private val binding get() = _binding!!
-
-    // TODO: replcae
-    private val binding_dog get() = _binding_dog!!
+    private var _bindingDog: FragmentHomeDogBinding? = null
+    private val binding
+        get() = when (requireContext().restoreChosenApi()) {
+            Constants.Api.DOG.ordinal -> _bindingDog
+            Constants.Api.NATIONALIZE.ordinal -> _binding
+            else -> _bindingDog
+        }
     private val viewModel by viewModels<HomeViewModel>()
     private var dialog = DisplayInfoDialogFragment("")
 
@@ -35,10 +38,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        _binding_dog = FragmentHomeDogBinding.inflate(inflater, container, false)
-        // TODO: replace
-        return binding_dog.root
+        when (requireContext().restoreChosenApi()) {
+            Constants.Api.DOG.ordinal -> {
+                _bindingDog = FragmentHomeDogBinding.inflate(inflater, container, false)
+            }
+            Constants.Api.NATIONALIZE.ordinal -> {
+                _binding = FragmentHomeBinding.inflate(inflater, container, false)
+            }
+            else -> {
+                _bindingDog = FragmentHomeDogBinding.inflate(inflater, container, false)
+            }
+        }
+        return binding?.root ?: View(requireContext())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,13 +69,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun bindUi() {
-        binding_dog.toolbar.title = "DOG-API"
-        bindNationalizePart()
-        bindDogPart()
+        when (binding) {
+            is FragmentHomeDogBinding -> bindDogPart(binding as FragmentHomeDogBinding)
+            is FragmentHomeBinding -> bindNationalizePart(binding as FragmentHomeBinding)
+        }
     }
 
-    private fun bindDogPart() {
-        with(binding_dog) {
+    private fun bindDogPart(fragmentHomeDogBinding: FragmentHomeDogBinding) {
+        with(fragmentHomeDogBinding) {
+            toolbar.apply {
+                title = "DOG API"
+                inflateMenu(R.menu.menu_main)
+                setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.action_settings -> {
+                            findNavController().navigate(R.id.action_HomeFragment_to_settingsFragment)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }
             button.setOnClickListener {
                 viewModel.getImage()
             }
@@ -79,8 +104,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun bindNationalizePart() {
-        with(binding) {
+    private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
+        with(fragmentHomeBinding) {
+            bindTextField(textField)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.nameCountryStateFlow.collect { list ->
                     list?.let {
@@ -97,7 +123,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     }
                 }
             }
-            bindTextField(textField)
         }
     }
 

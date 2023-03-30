@@ -1,6 +1,6 @@
 package com.example.rit.di
 
-import com.example.rit.data.datasource.BinListRemoteDataSource
+import com.example.rit.data.datasource.RemoteDataSource
 import com.example.rit.data.datasource.IBinListService
 import com.example.rit.data.network.INetwork
 import com.example.rit.data.network.Network
@@ -41,7 +41,7 @@ object NetworkModule {
 object DataSourceModule {
 
     @ActivityRetainedScoped
-    fun provideBinListRemoteDataSource(api: IBinListService): BinListRemoteDataSource {
+    fun provideBinListRemoteDataSource(api: IBinListService): RemoteDataSource {
         return provideBinListRemoteDataSource(api)
     }
 }
@@ -53,7 +53,7 @@ object RepositoryModule {
     @Provides
     @ActivityRetainedScoped
     fun provideHomeRepo(
-        dataSource: BinListRemoteDataSource,
+        dataSource: RemoteDataSource,
     ): IHomeRepo {
         return HomeRepo(dataSource)
     }

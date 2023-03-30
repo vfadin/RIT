@@ -30,12 +30,18 @@ class HomeViewModel @Inject constructor(
             is RequestResult.Error -> {}
         }
     }
+
     init {
         getImage()
     }
 
     fun getImage() {
         viewModelScope.launch(Dispatchers.IO) {
+            when (val response =
+                repo.sendCustomRequest("https://dog.ceo/api/breeds/image/random")) {
+                is RequestResult.Success -> println(response.result)
+                is RequestResult.Error -> {}
+            }
             when (val response = repo.getDogImage()) {
                 is RequestResult.Success -> _imageUrlStateFlow.emit(response.result)
                 is RequestResult.Error -> {}

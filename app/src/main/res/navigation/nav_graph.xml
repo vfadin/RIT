@@ -13,10 +13,17 @@
         <action
             android:id="@+id/action_HomeFragment_to_fullScreenImageFragment"
             app:destination="@id/fullScreenImageFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/fullScreenImageFragment"
         android:name="com.example.rit.ui.home.FullScreenImageFragment"
         android:label="FullScreenImageFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.rit.ui.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 
 </navigation>
