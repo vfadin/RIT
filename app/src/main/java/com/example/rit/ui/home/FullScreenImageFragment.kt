@@ -1,5 +1,6 @@
 package com.example.rit.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,11 @@ class FullScreenImageFragment : Fragment(R.layout.fragment_full_image) {
     private var _binding: FragmentFullImageBinding? = null
     private val binding get() = _binding!!
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        changeSystemBarsVisibility()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,17 +33,22 @@ class FullScreenImageFragment : Fragment(R.layout.fragment_full_image) {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        with(requireActivity()) {
+    private fun changeSystemBarsVisibility(to: Boolean = false) {
+        activity?.apply {
+            WindowCompat.setDecorFitsSystemWindows(window, to)
             val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
             windowInsetsController.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
+            if (to) {
+                windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+            } else {
                 windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                view.onApplyWindowInsets(windowInsets)
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.image.let {
             Glide.with(requireContext())
                 .load(arguments?.getString("url", ""))
@@ -46,5 +57,10 @@ class FullScreenImageFragment : Fragment(R.layout.fragment_full_image) {
                 findNavController().navigateUp()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        changeSystemBarsVisibility(true)
+        super.onDestroyView()
     }
 }

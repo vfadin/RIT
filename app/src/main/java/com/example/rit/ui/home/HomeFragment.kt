@@ -5,9 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +24,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private var _binding_dog: FragmentHomeDogBinding? = null
     private val binding get() = _binding!!
-    private var isFullScreen = false
 
     // TODO: replcae
     private val binding_dog get() = _binding_dog!!
@@ -53,7 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun openImageFullScreen() {
         viewModel.imageUrlStateFlow.value?.let {
             findNavController().navigate(
-                R.id.fullScreenImageFragment,
+                R.id.action_HomeFragment_to_fullScreenImageFragment,
                 Bundle().apply {
                     putString("url", it)
                 }
@@ -62,6 +58,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun bindUi() {
+        binding_dog.toolbar.title = "DOG-API"
         bindNationalizePart()
         bindDogPart()
     }

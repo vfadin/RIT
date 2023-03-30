@@ -30,6 +30,9 @@ class HomeViewModel @Inject constructor(
             is RequestResult.Error -> {}
         }
     }
+    init {
+        getImage()
+    }
 
     fun getImage() {
         viewModelScope.launch(Dispatchers.IO) {
