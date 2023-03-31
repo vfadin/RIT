@@ -1,9 +1,8 @@
 package com.example.rit.data.network
 
+import com.example.rit.domain.RequestResult
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
-import com.squareup.moshi.Moshi
-import com.example.rit.domain.RequestResult
 import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 import java.io.InterruptedIOException
@@ -22,7 +21,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): RequestResult<T> {
                 throwable.code()
             )
             is CancellationException -> RequestResult.Error(
-                mapError(throwable),
+                mapError(),
                 throwable.localizedMessage
             )
             is JsonDataException, is JsonEncodingException -> RequestResult.Error(
@@ -33,7 +32,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): RequestResult<T> {
                 RequestResult.Error(
                     if (hasConnectivityIssue(throwable)) mapError(throwable)
                     else mapError(throwable),
-                    throwable.localizedMessage
+                    "Unable to parse API error"
                 )
             }
         }
@@ -51,11 +50,9 @@ private fun mapError(httpException: HttpException) = when (httpException.code())
     else -> NetworkErrors.Http.Generic(fromHttpException())
 }
 
-private fun mapError(cancellationException: CancellationException) =
-    NetworkErrors.Cancellation.Cancelled
+private fun mapError() = NetworkErrors.Cancellation.Cancelled
 
-fun fromHttpException(httpException: HttpException? = null) =
-    ApiErrorMessage(message = "Unable to parse API error")
+fun fromHttpException() = ApiErrorMessage(message = "Unable to parse API error")
 
 private fun hasConnectivityIssue(throwable: Throwable): Boolean = throwable.isNetworkException()
 

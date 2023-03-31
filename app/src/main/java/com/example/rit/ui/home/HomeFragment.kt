@@ -21,7 +21,6 @@ import com.example.rit.databinding.FragmentHomeDogBinding
 import com.example.rit.utils.Constants
 import com.example.rit.utils.restoreChosenApi
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

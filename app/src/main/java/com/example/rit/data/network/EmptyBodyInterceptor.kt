@@ -5,7 +5,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 
-
 object EmptyBodyInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
