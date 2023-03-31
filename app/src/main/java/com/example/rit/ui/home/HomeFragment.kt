@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -77,19 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun bindDogPart(fragmentHomeDogBinding: FragmentHomeDogBinding) {
         with(fragmentHomeDogBinding) {
-            toolbar.apply {
-                title = "DOG API"
-                inflateMenu(R.menu.menu_main)
-                setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.action_settings -> {
-                            findNavController().navigate(R.id.action_HomeFragment_to_settingsFragment)
-                            true
-                        }
-                        else -> false
-                    }
-                }
-            }
+            bindToolBar(toolbar)
             button.setOnClickListener {
                 viewModel.getImage()
             }
@@ -104,8 +93,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private fun bindToolBar(toolbar: Toolbar) {
+        toolbar.apply {
+            inflateMenu(R.menu.menu_main)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.action_settings -> {
+                        findNavController().navigate(R.id.action_HomeFragment_to_settingsFragment)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+    }
+
     private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
         with(fragmentHomeBinding) {
+            bindToolBar(toolbar)
             bindTextField(textField)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.nameCountryStateFlow.collect { list ->
@@ -132,6 +137,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             setOnEditorActionListener { text, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     viewLifecycleOwner.lifecycleScope.launch {
+
                         viewModel.getNameInCountryProbability(text.text.toString())
                         dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
                     }
