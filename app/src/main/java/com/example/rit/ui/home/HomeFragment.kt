@@ -88,15 +88,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindCustomPart(fragmentHomeCustomBinding: FragmentHomeCustomBinding) {
         with(fragmentHomeCustomBinding) {
             bindToolBar(toolbar)
-            bindOnDoneAction(textField) { text ->
+            bindOnDoneAction(textFieldCustom) { text ->
                 viewModel.sendCustomRequest(text)
             }
-            textField.addTextChangedListener {
+            textFieldCustom.addTextChangedListener {
                 toolbar.title = it
             }
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.customResponseStateFlow.collect {
-                    textViewRequestAnswer.text = it
+                    textViewRequestAnswerCustom.text = it
                 }
             }
         }
@@ -137,7 +137,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
         with(fragmentHomeBinding) {
             bindToolBar(toolbar)
-            bindOnDoneAction(textField) { text ->
+            bindOnDoneAction(textFieldNationalize) { text ->
                 viewModel.getNameInCountryProbability(text)
                 dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
             }
