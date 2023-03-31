@@ -6,9 +6,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-class Network(
-    private val interceptor: SupportInterceptor,
-) : INetwork {
+object Network : INetwork {
 
     override val retrofit: Retrofit by lazy {
         Retrofit.Builder()
@@ -21,7 +19,7 @@ class Network(
 
     private fun buildClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
+            .addInterceptor(SupportInterceptor())
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .addInterceptor(EmptyBodyInterceptor)

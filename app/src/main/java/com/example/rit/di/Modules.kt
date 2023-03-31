@@ -1,7 +1,9 @@
 package com.example.rit.di
 
+import com.example.rit.data.datasource.services.ICustomService
+import com.example.rit.data.datasource.services.IDogService
 import com.example.rit.data.datasource.RemoteDataSource
-import com.example.rit.data.datasource.IBinListService
+import com.example.rit.data.datasource.services.INationalizeService
 import com.example.rit.data.network.INetwork
 import com.example.rit.data.network.Network
 import com.example.rit.data.network.SupportInterceptor
@@ -23,15 +25,23 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideNetwork(supportInterceptor: SupportInterceptor): INetwork {
-        return Network(supportInterceptor)
+    fun provideNetwork(): INetwork {
+        return Network
     }
 
     @Provides
-    fun provideBinListService(network: INetwork): IBinListService {
-        return network.retrofit.create(
-            IBinListService::class.java
-        )
+    fun provideNationalizeService(network: INetwork): INationalizeService {
+        return network.retrofit.create(INationalizeService::class.java)
+    }
+
+    @Provides
+    fun provideDogService(network: INetwork): IDogService {
+        return network.retrofit.create(IDogService::class.java)
+    }
+
+    @Provides
+    fun provideCustomService(network: INetwork): ICustomService {
+        return network.retrofit.create(ICustomService::class.java)
     }
 
 }
@@ -41,7 +51,7 @@ object NetworkModule {
 object DataSourceModule {
 
     @ActivityRetainedScoped
-    fun provideBinListRemoteDataSource(api: IBinListService): RemoteDataSource {
+    fun provideBinListRemoteDataSource(api: INationalizeService): RemoteDataSource {
         return provideBinListRemoteDataSource(api)
     }
 }
