@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +20,7 @@ import com.example.rit.databinding.FragmentHomeCustomBinding
 import com.example.rit.databinding.FragmentHomeDogBinding
 import com.example.rit.utils.Constants
 import com.example.rit.utils.restoreChosenApi
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
@@ -91,6 +93,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindCustomPart(fragmentHomeCustomBinding: FragmentHomeCustomBinding) {
         with(fragmentHomeCustomBinding) {
             bindToolBar(toolbar)
+            bindLoadingIndicator(loadingIndicator)
             bindOnDoneAction(textFieldCustom) { text ->
                 viewModel.sendCustomRequest(text)
             }
@@ -108,6 +111,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindDogPart(fragmentHomeDogBinding: FragmentHomeDogBinding) {
         with(fragmentHomeDogBinding) {
             bindToolBar(toolbar)
+            bindLoadingIndicator(loadingIndicator)
             button.setOnClickListener {
                 viewModel.getImage()
             }
@@ -118,6 +122,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 viewModel.imageUrlStateFlow.collect {
                     Glide.with(requireContext()).load(it).into(image)
                 }
+            }
+        }
+    }
+
+    private fun bindLoadingIndicator(loadingIndicator: CircularProgressIndicator) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.loadingSharedFlow.collect {
+                loadingIndicator.isVisible = it
             }
         }
     }
@@ -140,6 +152,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
         with(fragmentHomeBinding) {
             bindToolBar(toolbar)
+            bindLoadingIndicator(loadingIndicator)
             bindOnDoneAction(textFieldNationalize) { text ->
                 viewModel.getNameInCountryProbability(text)
                 dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)

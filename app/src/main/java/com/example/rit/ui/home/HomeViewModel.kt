@@ -27,8 +27,12 @@ class HomeViewModel @Inject constructor(
     private val _errorSharedFlow = MutableSharedFlow<String>()
     val errorSharedFlow = _errorSharedFlow.asSharedFlow()
 
+    private val isLoading = MutableSharedFlow<Boolean>()
+    val loadingSharedFlow = isLoading.asSharedFlow()
+
     fun sendCustomRequest(url: String) {
         viewModelScope.launch {
+            isLoading.emit(true)
             when (val response = repo.sendCustomRequest(url)) {
                 is RequestResult.Success -> _customResponseStateFlow.emit(response.result)
                 is RequestResult.Error -> {
@@ -36,23 +40,28 @@ class HomeViewModel @Inject constructor(
                     _errorSharedFlow.emit(response.data ?: "Unknown error")
                 }
             }
+            isLoading.emit(false)
         }
     }
 
     suspend fun getNameInCountryProbability(name: String) {
+        isLoading.emit(true)
         val slices = name.split(',')
         when (val response = repo.getNameInfo(slices)) {
             is RequestResult.Success -> _nameCountryStateFlow.emit(response.result)
             is RequestResult.Error -> _errorSharedFlow.emit(response.data ?: "Unknown error")
         }
+        isLoading.emit(false)
     }
 
     fun getImage() {
         viewModelScope.launch(Dispatchers.IO) {
+            isLoading.emit(true)
             when (val response = repo.getDogImage()) {
                 is RequestResult.Success -> _imageUrlStateFlow.emit(response.result)
                 is RequestResult.Error -> _errorSharedFlow.emit(response.data ?: "Unknown error")
             }
+            isLoading.emit(false)
         }
     }
 }
