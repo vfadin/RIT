@@ -7,10 +7,7 @@ import com.example.rit.domain.entity.CountryNameProbability
 import com.example.rit.domain.repo.IHomeRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,15 +24,17 @@ class HomeViewModel @Inject constructor(
     private val _customResponseStateFlow = MutableStateFlow<String?>(null)
     val customResponseStateFlow = _customResponseStateFlow.asStateFlow()
 
-    init {
-        getImage()
-    }
+    private val _errorSharedFlow = MutableSharedFlow<String>()
+    val errorSharedFlow = _errorSharedFlow.asSharedFlow()
 
     fun sendCustomRequest(url: String) {
         viewModelScope.launch {
             when (val response = repo.sendCustomRequest(url)) {
                 is RequestResult.Success -> _customResponseStateFlow.emit(response.result)
-                is RequestResult.Error -> {}
+                is RequestResult.Error -> {
+                    _customResponseStateFlow.emit(response.data ?: "Unknown error")
+                    _errorSharedFlow.emit(response.data ?: "Unknown error")
+                }
             }
         }
     }
@@ -44,20 +43,15 @@ class HomeViewModel @Inject constructor(
         val slices = name.split(',')
         when (val response = repo.getNameInfo(slices)) {
             is RequestResult.Success -> _nameCountryStateFlow.emit(response.result)
-            is RequestResult.Error -> {}
+            is RequestResult.Error -> _errorSharedFlow.emit(response.data ?: "Unknown error")
         }
     }
 
     fun getImage() {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val response =
-                repo.sendCustomRequest("https://dog.ceo/api/breeds/image/random")) {
-                is RequestResult.Success -> println(response.result)
-                is RequestResult.Error -> {}
-            }
             when (val response = repo.getDogImage()) {
                 is RequestResult.Success -> _imageUrlStateFlow.emit(response.result)
-                is RequestResult.Error -> {}
+                is RequestResult.Error -> _errorSharedFlow.emit(response.data ?: "Unknown error")
             }
         }
     }

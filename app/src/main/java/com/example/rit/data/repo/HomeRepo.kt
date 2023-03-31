@@ -29,7 +29,9 @@ class HomeRepo(
     override suspend fun sendCustomRequest(url: String): RequestResult<String> {
         return when (val response = dataSource.sendCustomRequest(url)) {
             is RequestResult.Success -> RequestResult.Success(response.result.string())
-            is RequestResult.Error -> RequestResult.Error(response.exception)
+            is RequestResult.Error -> {
+                RequestResult.Error(response.exception, response.data)
+            }
         }
     }
 }

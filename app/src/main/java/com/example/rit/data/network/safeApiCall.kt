@@ -11,11 +11,6 @@ import java.net.*
 import java.nio.channels.ClosedChannelException
 import javax.net.ssl.SSLException
 
-inline fun <reified T> convert(json: String): T? {
-    val jsonAdapter = Moshi.Builder().build().adapter(T::class.java)
-    return jsonAdapter.fromJson(json)
-}
-
 suspend fun <T> safeApiCall(apiCall: suspend () -> T): RequestResult<T> {
     return try {
         RequestResult.Success(apiCall())
@@ -23,24 +18,27 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): RequestResult<T> {
         when (throwable) {
             is HttpException -> RequestResult.Error(
                 mapError(throwable),
-                throwable.response()?.errorBody()?.string()
+                throwable.response()?.errorBody()?.string(),
+                throwable.code()
             )
             is CancellationException -> RequestResult.Error(
-                mapError(throwable)
+                mapError(throwable),
+                throwable.localizedMessage
             )
             is JsonDataException, is JsonEncodingException -> RequestResult.Error(
-                mapError(throwable)
+                mapError(throwable),
+                throwable.localizedMessage
             )
             else -> {
                 RequestResult.Error(
                     if (hasConnectivityIssue(throwable)) mapError(throwable)
-                    else mapError(throwable)
+                    else mapError(throwable),
+                    throwable.localizedMessage
                 )
             }
         }
     }
 }
-
 
 private fun mapError(httpException: HttpException) = when (httpException.code()) {
     401 -> NetworkErrors.Http.Unauthorized(fromHttpException())

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import com.example.rit.databinding.FragmentHomeCustomBinding
 import com.example.rit.databinding.FragmentHomeDogBinding
 import com.example.rit.utils.Constants
 import com.example.rit.utils.restoreChosenApi
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -83,6 +85,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             is FragmentHomeBinding -> bindNationalizePart(binding as FragmentHomeBinding)
             is FragmentHomeCustomBinding -> bindCustomPart(binding as FragmentHomeCustomBinding)
         }
+        bindErrorToast()
     }
 
     private fun bindCustomPart(fragmentHomeCustomBinding: FragmentHomeCustomBinding) {
@@ -173,6 +176,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 false
             }
             isSingleLine = true
+        }
+    }
+
+    private fun bindErrorToast() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.errorSharedFlow.collect {
+                Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
