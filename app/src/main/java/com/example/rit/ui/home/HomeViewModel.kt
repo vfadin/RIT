@@ -20,8 +20,25 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _nameCountryStateFlow = MutableStateFlow<List<CountryNameProbability>?>(null)
     val nameCountryStateFlow = _nameCountryStateFlow.asStateFlow()
+
     private val _imageUrlStateFlow = MutableStateFlow<String?>(null)
     val imageUrlStateFlow = _imageUrlStateFlow.asStateFlow()
+
+    private val _customResponseStateFlow = MutableStateFlow<String?>(null)
+    val customResponseStateFlow = _customResponseStateFlow.asStateFlow()
+
+    init {
+        getImage()
+    }
+
+    fun sendCustomRequest(url: String) {
+        viewModelScope.launch {
+            when (val response = repo.sendCustomRequest(url)) {
+                is RequestResult.Success -> _customResponseStateFlow.emit(response.result)
+                is RequestResult.Error -> {}
+            }
+        }
+    }
 
     suspend fun getNameInCountryProbability(name: String) {
         val slices = name.split(',')
@@ -29,10 +46,6 @@ class HomeViewModel @Inject constructor(
             is RequestResult.Success -> _nameCountryStateFlow.emit(response.result)
             is RequestResult.Error -> {}
         }
-    }
-
-    init {
-        getImage()
     }
 
     fun getImage() {

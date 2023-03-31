@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.rit.R
 import com.example.rit.databinding.FragmentHomeBinding
+import com.example.rit.databinding.FragmentHomeCustomBinding
 import com.example.rit.databinding.FragmentHomeDogBinding
 import com.example.rit.utils.Constants
 import com.example.rit.utils.restoreChosenApi
@@ -25,10 +27,12 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private var _bindingDog: FragmentHomeDogBinding? = null
+    private var _bindingCustom: FragmentHomeCustomBinding? = null
     private val binding
         get() = when (requireContext().restoreChosenApi()) {
             Constants.Api.DOG.ordinal -> _bindingDog
             Constants.Api.NATIONALIZE.ordinal -> _binding
+            Constants.Api.CUSTOM.ordinal -> _bindingCustom
             else -> _bindingDog
         }
     private val viewModel by viewModels<HomeViewModel>()
@@ -45,6 +49,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             Constants.Api.NATIONALIZE.ordinal -> {
                 _binding = FragmentHomeBinding.inflate(inflater, container, false)
+            }
+            Constants.Api.CUSTOM.ordinal -> {
+                _bindingCustom = FragmentHomeCustomBinding.inflate(inflater, container, false)
             }
             else -> {
                 _bindingDog = FragmentHomeDogBinding.inflate(inflater, container, false)
@@ -73,6 +80,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         when (binding) {
             is FragmentHomeDogBinding -> bindDogPart(binding as FragmentHomeDogBinding)
             is FragmentHomeBinding -> bindNationalizePart(binding as FragmentHomeBinding)
+            is FragmentHomeCustomBinding -> bindCustomPart(binding as FragmentHomeCustomBinding)
+        }
+    }
+
+    private fun bindCustomPart(fragmentHomeCustomBinding: FragmentHomeCustomBinding) {
+        with(fragmentHomeCustomBinding) {
+            bindToolBar(toolbar)
+            bindTextField(textField) { text ->
+                viewModel.sendCustomRequest(text)
+            }
+            textField.addTextChangedListener {
+                toolbar.title = it
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.customResponseStateFlow.collect {
+                    textViewRequestAnswer.text = it
+                }
+            }
         }
     }
 
@@ -111,7 +136,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
         with(fragmentHomeBinding) {
             bindToolBar(toolbar)
-            bindTextField(textField)
+            bindTextField(textField) { text ->
+                viewModel.getNameInCountryProbability(text)
+                dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
+            }
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.nameCountryStateFlow.collect { list ->
                     list?.let {
@@ -131,15 +159,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun bindTextField(textField: TextInputEditText) {
+    private fun bindTextField(textField: TextInputEditText, onDone: suspend (String) -> Unit) {
         textField.apply {
             imeOptions = EditorInfo.IME_ACTION_DONE
             setOnEditorActionListener { text, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     viewLifecycleOwner.lifecycleScope.launch {
-
-                        viewModel.getNameInCountryProbability(text.text.toString())
-                        dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
+                        onDone(text.text.toString())
                     }
                     return@setOnEditorActionListener true
                 }

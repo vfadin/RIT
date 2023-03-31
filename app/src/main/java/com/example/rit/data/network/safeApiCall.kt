@@ -20,32 +20,21 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): RequestResult<T> {
     return try {
         RequestResult.Success(apiCall())
     } catch (throwable: Exception) {
-        println(throwable)
         when (throwable) {
             is HttpException -> RequestResult.Error(
-                (mapError(
-                    throwable
-                )),
+                mapError(throwable),
                 throwable.response()?.errorBody()?.string()
             )
             is CancellationException -> RequestResult.Error(
-                mapError(
-                    throwable
-                )
+                mapError(throwable)
             )
             is JsonDataException, is JsonEncodingException -> RequestResult.Error(
-                mapError(
-                    throwable
-                )
+                mapError(throwable)
             )
             else -> {
                 RequestResult.Error(
-                    if (hasConnectivityIssue(
-                            throwable
-                        )
-                    ) mapError(throwable)
-                    else error(throwable)
-
+                    if (hasConnectivityIssue(throwable)) mapError(throwable)
+                    else mapError(throwable)
                 )
             }
         }
