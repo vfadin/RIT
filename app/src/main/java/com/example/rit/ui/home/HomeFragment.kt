@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
+
     private var _binding: FragmentHomeBinding? = null
     private var _bindingDog: FragmentHomeDogBinding? = null
     private var _bindingCustom: FragmentHomeCustomBinding? = null
@@ -87,7 +88,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindCustomPart(fragmentHomeCustomBinding: FragmentHomeCustomBinding) {
         with(fragmentHomeCustomBinding) {
             bindToolBar(toolbar)
-            bindTextField(textField) { text ->
+            bindOnDoneAction(textField) { text ->
                 viewModel.sendCustomRequest(text)
             }
             textField.addTextChangedListener {
@@ -136,7 +137,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun bindNationalizePart(fragmentHomeBinding: FragmentHomeBinding) {
         with(fragmentHomeBinding) {
             bindToolBar(toolbar)
-            bindTextField(textField) { text ->
+            bindOnDoneAction(textField) { text ->
                 viewModel.getNameInCountryProbability(text)
                 dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
             }
@@ -159,7 +160,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun bindTextField(textField: TextInputEditText, onDone: suspend (String) -> Unit) {
+    private fun bindOnDoneAction(textField: TextInputEditText, onDone: suspend (String) -> Unit) {
         textField.apply {
             imeOptions = EditorInfo.IME_ACTION_DONE
             setOnEditorActionListener { text, actionId, _ ->
