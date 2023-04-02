@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
-        android:text="Names"
+        android:text="@string/label_names"
         app:layout_constraintBottom_toTopOf="@id/text_input_layout_nationalize"
         app:layout_constraintStart_toStartOf="parent" />
 

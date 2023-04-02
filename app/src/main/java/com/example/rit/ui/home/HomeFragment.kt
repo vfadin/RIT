@@ -11,7 +11,9 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.rit.R
@@ -100,8 +102,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 toolbar.title = it
             }
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.customResponseStateFlow.collect {
-                    textViewRequestAnswerCustom.text = it
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.customResponseStateFlow.collect {
+                        textViewRequestAnswerCustom.text = it
+                    }
                 }
             }
         }
@@ -118,8 +122,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 openImageFullScreen()
             }
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.imageUrlStateFlow.collect {
-                    Glide.with(requireContext()).load(it).into(image)
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.imageUrlStateFlow.collect {
+                        Glide.with(requireContext()).load(it).into(image)
+                    }
                 }
             }
         }
@@ -127,8 +133,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun bindLoadingIndicator(loadingIndicator: CircularProgressIndicator) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadingSharedFlow.collect {
-                loadingIndicator.isVisible = it
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadingSharedFlow.collect {
+                    loadingIndicator.isVisible = it
+                }
             }
         }
     }
@@ -157,18 +165,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 dialog.show(childFragmentManager, DisplayInfoDialogFragment.TAG)
             }
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.nameCountryStateFlow.collect { list ->
-                    list?.let {
-                        dialog = DisplayInfoDialogFragment(
-                            buildString {
-                                list.forEach { nameProbability ->
-                                    append(getString(R.string.nationalize_answer_title))
-                                    append(" ${nameProbability.name} in:\n")
-                                    append(nameProbability.country.joinToString(separator = "") {
-                                        it.toString()
-                                    })
-                                }
-                            })
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.nameCountryStateFlow.collect { list ->
+                        list?.let {
+                            dialog = DisplayInfoDialogFragment(
+                                buildString {
+                                    list.forEach { nameProbability ->
+                                        append(getString(R.string.nationalize_answer_title))
+                                        append(" ${nameProbability.name} in:\n")
+                                        append(nameProbability.country.joinToString(separator = "") {
+                                            it.toString()
+                                        })
+                                    }
+                                })
+                        }
                     }
                 }
             }
@@ -193,8 +203,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun bindErrorToast() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.errorSharedFlow.collect {
-                Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_LONG).show()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.errorSharedFlow.collect {
+                    Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
